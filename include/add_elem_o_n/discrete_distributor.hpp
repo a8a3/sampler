@@ -10,33 +10,32 @@ template<typename T>
 class DiscreteDistributionSampler
 {
 public:
-    explicit DiscreteDistributionSampler(const std::vector<std::pair<T, float>>& objectsWithWeights)
+    explicit DiscreteDistributionSampler(std::vector<std::pair<T, float>> objectsWithWeights)
     {
-        objects_.reserve(objectsWithWeights.size());
-
-        for (const auto& [object, weight]: objectsWithWeights) {
-            objects_.push_back(object);
-            assert(weight > 0.0);
+        for (const auto& [_, weight]: objectsWithWeights) {
+            assert(weight > 0.f);
             totalWeight_ += weight;
         }
         
-        float currentWeight = 0.0;
+        float currentWeight = 0.f;
+        objects_.reserve(objectsWithWeights.size());
         cumulativeProbabilities_.reserve(objectsWithWeights.size());
 
-        for (const auto& [_, weight]: objectsWithWeights) {
+        for (auto& [object, weight]: objectsWithWeights) {
+            objects_.push_back(std::move(object));
             currentWeight += weight;
             cumulativeProbabilities_.push_back(currentWeight / totalWeight_);
         }
     }
 
-    void AddObject(const T& obj, float weight) {
+    void AddObject(T obj, float weight) {
         assert(weight > 0.f);
 
         for (auto& probability: cumulativeProbabilities_) {
             probability *= totalWeight_ / (totalWeight_ + weight);
         }
         cumulativeProbabilities_.push_back(1.f);
-        objects_.push_back(obj);
+        objects_.push_back(std::move(obj));
         totalWeight_ += weight;
     }
 
