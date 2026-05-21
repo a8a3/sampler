@@ -5,7 +5,6 @@
 
 #include "origin/discrete_distributor.hpp"
 #include "improved/discrete_distributor.hpp"
-#include "add_elem_o_n/discrete_distributor.hpp"
 #include "add_elem_o_1/discrete_distributor.hpp"
 
 struct OriginSamplerTraits
@@ -29,15 +28,6 @@ struct ImprovedSamplerTraits
 template<typename Traits>
 class DiscreteDistributionSamplerCommonTest : public ::testing::Test {};
 
-struct AddElemONSamplerTraits
-{
-    using ValueType = int;
-    static add_elem_0_n::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
-    {
-        return add_elem_0_n::DiscreteDistributionSampler<int>(items);
-    }
-};
-
 struct AddElemO1SamplerTraits
 {
     using ValueType = int;
@@ -47,7 +37,7 @@ struct AddElemO1SamplerTraits
     }
 };
 
-using SamplerTypes = ::testing::Types<OriginSamplerTraits, ImprovedSamplerTraits, AddElemONSamplerTraits, AddElemO1SamplerTraits>;
+using SamplerTypes = ::testing::Types<OriginSamplerTraits, ImprovedSamplerTraits, AddElemO1SamplerTraits>;
 TYPED_TEST_SUITE(DiscreteDistributionSamplerCommonTest, SamplerTypes);
 
 // Common tests

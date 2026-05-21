@@ -3,17 +3,7 @@
 #include <set>
 #include <vector>
 
-#include "add_elem_o_n/discrete_distributor.hpp"
 #include "add_elem_o_1/discrete_distributor.hpp"
-
-struct AddElemONTraits
-{
-    using ValueType = int;
-    static add_elem_0_n::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
-    {
-        return add_elem_0_n::DiscreteDistributionSampler<int>(items);
-    }
-};
 
 struct AddElemO1Traits
 {
@@ -28,7 +18,7 @@ struct AddElemO1Traits
 template<typename Traits>
 class AddElemCommonTest : public ::testing::Test {};
 
-using AddElemSamplerTypes = ::testing::Types<AddElemONTraits, AddElemO1Traits>;
+using AddElemSamplerTypes = ::testing::Types<AddElemO1Traits>;
 TYPED_TEST_SUITE(AddElemCommonTest, AddElemSamplerTypes);
 
 
