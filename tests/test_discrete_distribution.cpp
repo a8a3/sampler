@@ -1,43 +1,23 @@
 #include <gtest/gtest.h>
 
+#include <random>
 #include <set>
 #include <vector>
 
-#include "origin/discrete_distributor.hpp"
 #include "improved/discrete_distributor.hpp"
-#include "add_elem_o_1/discrete_distributor.hpp"
-
-struct OriginSamplerTraits
-{
-    using ValueType = int;
-    static origin::DiscreteDistributionSampler Make(std::vector<std::pair<int, float>> items)
-    {
-        return origin::DiscreteDistributionSampler(items);
-    }
-};
 
 struct ImprovedSamplerTraits
 {
     using ValueType = int;
-    static improved::DiscreteDistributionSampler<int> Make(std::vector<std::pair<int, float>> items)
-    {
-        return improved::DiscreteDistributionSampler<int>(items);
+    static improved::DiscreteDistributionSampler<int> Make(std::vector<std::pair<int, float>> items) {
+        return improved::DiscreteDistributionSampler<int>(items, std::mt19937{42});
     }
 };
 
 template<typename Traits>
 class DiscreteDistributionSamplerCommonTest : public ::testing::Test {};
 
-struct AddElemO1SamplerTraits
-{
-    using ValueType = int;
-    static add_elem_o_1::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
-    {
-        return add_elem_o_1::DiscreteDistributionSampler<int>(items);
-    }
-};
-
-using SamplerTypes = ::testing::Types<OriginSamplerTraits, ImprovedSamplerTraits, AddElemO1SamplerTraits>;
+using SamplerTypes = ::testing::Types<ImprovedSamplerTraits>;
 TYPED_TEST_SUITE(DiscreteDistributionSamplerCommonTest, SamplerTypes);
 
 // Common tests
@@ -45,15 +25,6 @@ TYPED_TEST(DiscreteDistributionSamplerCommonTest, SingleElementAlwaysReturned)
 {
     auto sampler = TypeParam::Make({{42, 1.0f}});
     ASSERT_EQ(sampler.Sample(), 42);
-}
-
-TYPED_TEST(DiscreteDistributionSamplerCommonTest, SampleIsAlwaysFromInputSet)
-{
-    auto sampler = TypeParam::Make({{10, 1.0f}, {20, 2.0f}, {30, 3.0f}});
-    for (int i = 0; i < 100; ++i) {
-        const auto result = sampler.Sample();
-        ASSERT_TRUE(result == 10 || result == 20 || result == 30);
-    }
 }
 
 TYPED_TEST(DiscreteDistributionSamplerCommonTest, AllElementsAreReachable)

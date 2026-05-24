@@ -1,19 +1,17 @@
-include(FetchContent)
 
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        v1.15.2
-)
-
-# Prevent GTest from overriding compiler/linker settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+if(NOT GTest_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        v1.15.2
+    )
+    FetchContent_MakeAvailable(googletest)
+endif()
 
 add_executable(tests
-    test_discrete_distribution_common.cpp
-    test_discrete_distributor_improved.cpp
-    test_discrete_distribution_add_elem_common.cpp
+    test_discrete_distribution.cpp
+    test_discrete_distribution_add_elem.cpp
 )
 
 target_include_directories(tests

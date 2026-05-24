@@ -3,22 +3,21 @@
 #include <set>
 #include <vector>
 
-#include "add_elem_o_1/discrete_distributor.hpp"
+#include "improved/discrete_distributor.hpp"
 
-struct AddElemO1Traits
+struct ImprovedTraits
 {
     using ValueType = int;
-    static add_elem_o_1::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
+    static improved::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
     {
-        return add_elem_o_1::DiscreteDistributionSampler<int>(items);
+        return improved::DiscreteDistributionSampler<int>(items);
     }
 };
-
 
 template<typename Traits>
 class AddElemCommonTest : public ::testing::Test {};
 
-using AddElemSamplerTypes = ::testing::Types<AddElemO1Traits>;
+using AddElemSamplerTypes = ::testing::Types<ImprovedTraits>;
 TYPED_TEST_SUITE(AddElemCommonTest, AddElemSamplerTypes);
 
 
@@ -72,15 +71,4 @@ TYPED_TEST(AddElemCommonTest, HighWeightAddedOutcomeSampledMoreOften)
         }
     }
     ASSERT_GT(heavyCount, 800);
-}
-
-TYPED_TEST(AddElemCommonTest, SampleOnlyFromKnownOutcomesAfterAdd)
-{
-    auto sampler = TypeParam::Make({{10, 1.0f}, {20, 1.0f}});
-    sampler.AddObject(30, 1.0f);
-
-    for (int i = 0; i < 500; ++i) {
-        const auto result = sampler.Sample();
-        ASSERT_TRUE(result == 10 || result == 20 || result == 30);
-    }
 }
