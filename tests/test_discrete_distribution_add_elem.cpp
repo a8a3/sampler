@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <random>
 #include <set>
 #include <vector>
 
@@ -10,7 +11,7 @@ struct ImprovedTraits
     using ValueType = int;
     static improved::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
     {
-        return improved::DiscreteDistributionSampler<int>(items);
+        return improved::DiscreteDistributionSampler<int>(items, std::mt19937{42});
     }
 };
 
