@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <set>
-#include <vector>
-
 #include "improved/discrete_distributor.hpp"
 
 struct ImprovedTraits
