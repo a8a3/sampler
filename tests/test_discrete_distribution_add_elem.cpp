@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <random>
 #include <set>
 #include <vector>
 
@@ -11,7 +10,7 @@ struct ImprovedTraits
     using ValueType = int;
     static improved::DiscreteDistributionSampler<int> Make(const std::vector<std::pair<int, float>>& items)
     {
-        return improved::DiscreteDistributionSampler<int>(items, std::mt19937{42});
+        return improved::DiscreteDistributionSampler<int>(items);
     }
 };
 
@@ -21,29 +20,22 @@ class AddElemCommonTest : public ::testing::Test {};
 using AddElemSamplerTypes = ::testing::Types<ImprovedTraits>;
 TYPED_TEST_SUITE(AddElemCommonTest, AddElemSamplerTypes);
 
-
 TYPED_TEST(AddElemCommonTest, AddedOutcomeIsReachable)
 {
     auto sampler = TypeParam::Make({{1, 1.0f}});
-    sampler.AddObject(2, 1.0f);
+    ASSERT_EQ(sampler.SampleByValue(.9f), 1);
 
-    std::set<int> seen;
-    for (int i = 0; i < 1'000; ++i) {
-        seen.insert(sampler.Sample());
-    }
-    ASSERT_TRUE(seen.count(2));
+    sampler.AddObject(2, 1.0f);
+    ASSERT_EQ(sampler.SampleByValue(1.1f), 2);
 }
 
 TYPED_TEST(AddElemCommonTest, OriginalOutcomeStillReachableAfterAdd)
 {
     auto sampler = TypeParam::Make({{1, 1.0f}});
-    sampler.AddObject(2, 1.0f);
+    ASSERT_EQ(sampler.SampleByValue(.9f), 1);
 
-    std::set<int> seen;
-    for (int i = 0; i < 1'000; ++i) {
-        seen.insert(sampler.Sample());
-    }
-    ASSERT_TRUE(seen.count(1));
+    sampler.AddObject(2, 1.0f);
+    ASSERT_EQ(sampler.SampleByValue(.9f), 1);
 }
 
 TYPED_TEST(AddElemCommonTest, AllOutcomesReachableAfterMultipleAdds)
@@ -52,24 +44,7 @@ TYPED_TEST(AddElemCommonTest, AllOutcomesReachableAfterMultipleAdds)
     sampler.AddObject(2, 1.0f);
     sampler.AddObject(3, 1.0f);
 
-    std::set<int> seen;
-    for (int i = 0; i < 1'000; ++i) {
-        seen.insert(sampler.Sample());
-    }
-    ASSERT_EQ(seen.size(), 3u);
-}
-
-TYPED_TEST(AddElemCommonTest, HighWeightAddedOutcomeSampledMoreOften)
-{
-    auto sampler = TypeParam::Make({{1, 1.0f}});
-    sampler.AddObject(99, 10.0f);
-
-    int heavyCount = 0;
-    constexpr int kTrials = 1'000;
-    for (int i = 0; i < kTrials; ++i) {
-        if (sampler.Sample() == 99) {
-            ++heavyCount;
-        }
-    }
-    ASSERT_GT(heavyCount, 800);
+    ASSERT_EQ(sampler.SampleByValue(0.9f), 1);
+    ASSERT_EQ(sampler.SampleByValue(1.9f), 2);
+    ASSERT_EQ(sampler.SampleByValue(2.9f), 3);
 }

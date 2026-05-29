@@ -35,8 +35,15 @@ public:
 
     const T& Sample() const
     {
+        assert(totalWeight_ >= 0.f);
         auto target = std::uniform_real_distribution<float>{0.f, totalWeight_}(urng_);
-        auto it = std::lower_bound(cumulativeProbabilities_.begin(), cumulativeProbabilities_.end(), target);
+        return SampleByValue(target);
+    }
+
+    const T& SampleByValue(float val) const
+    {
+        assert(val >= 0.f && val < totalWeight_);
+        auto it = std::lower_bound(cumulativeProbabilities_.begin(), cumulativeProbabilities_.end(), val);
         assert(it != cumulativeProbabilities_.end());
         return objects_[it - cumulativeProbabilities_.begin()];
     }
