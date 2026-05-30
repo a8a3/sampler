@@ -64,7 +64,7 @@ private:
     std::vector<T> objects_;
     std::vector<float> cumulativeProbabilities_;
     float totalWeight_{0.f};
-    std::shared_mutex mtx_;
+    mutable std::shared_mutex mtx_;
 };
 
 } // improved::rwlock
